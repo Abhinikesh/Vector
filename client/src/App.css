@@ -505,11 +505,11 @@ input {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0 1rem;
+  padding: 0 0.5rem 0 0.8rem;
   border-right: 1px solid var(--border-subtle);
   cursor: pointer;
   user-select: none;
-  min-width: 80px;
+  min-width: 100px;
   max-width: 160px;
   position: relative;
   transition: background-color var(--t-fast) ease;
@@ -576,6 +576,7 @@ input {
   visibility: hidden;
   border-radius: 2px;
   transition: color var(--t-fast) ease, background-color var(--t-fast) ease;
+  margin-left: auto;
 }
 
 .tab-item:hover .tab-delete-btn {
@@ -790,36 +791,4 @@ button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
-}
-
-/* ─── Typewriter Pane ───────────────────────────────────────── */
-/* Replaces Monaco only during the one-time welcome.md animation */
-.typewriter-pane {
-  flex: 1;
-  height: 100%;
-  background-color: #1e1e1e; /* matches vs-dark Monaco background */
-  overflow: auto;
-  padding: 12px 0 12px 72px; /* 72px left matches Monaco's default gutter */
-}
-
-.typewriter-pre {
-  margin: 0;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #d4d4d4; /* vs-dark default text colour */
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* Blinking block cursor */
-.typewriter-cursor {
-  display: inline-block;
-  color: var(--accent);
-  animation: tw-blink 0.8s step-end infinite;
-}
-
-@keyframes tw-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
 }

@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
+
+// Eagerly pre-load Monaco editor assets in the background as early as possible
+loader.init().catch(err => console.error('Monaco pre-load failed:', err));
 import JSZip from 'jszip';
 import {
   Check,
@@ -47,9 +50,7 @@ function App() {
   const [newFilenameVal, setNewFilenameVal] = useState<string>('');
   const [addFileError, setAddFileError] = useState<string | null>(null);
 
-  // Typewriter effect state
-  const [typewriterText, setTypewriterText] = useState<string>('');
-  const [typewriterActive, setTypewriterActive] = useState<boolean>(false);
+
 
   const [connectionStatus, setConnectionStatus] = useState<'Live' | 'Reconnecting...' | 'Offline'>('Offline');
 
@@ -63,10 +64,7 @@ function App() {
   const typingTimeoutRef = useRef<any>(null);
   const lastEmitTimeRef = useRef<number>(0);
   const emitTimeoutRef = useRef<any>(null);
-  // Typewriter refs — persist across renders without triggering re-renders
-  const isNewRoomRef = useRef<boolean>(false);
-  const typewriterPlayedRef = useRef<boolean>(false);
-  const typewriterTimerRef = useRef<any>(null);
+  const localAddingFilenameRef = useRef<string | null>(null);
 
   const hasHtmlFile = files.some(f => f.filename.toLowerCase().endsWith('.html'));
 
@@ -74,46 +72,28 @@ function App() {
     return () => {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       if (emitTimeoutRef.current) clearTimeout(emitTimeoutRef.current);
-      if (typewriterTimerRef.current) clearTimeout(typewriterTimerRef.current);
     };
   }, []);
 
-  /* ── Typewriter effect — plays once on new room creation ──── */
+
+
+  /* ── Save active tab in localStorage ─────────────────────── */
   useEffect(() => {
-    // Only play if: this is a new room, the animation hasn't played yet,
-    // and welcome.md is the active file with content loaded.
-    if (!isNewRoomRef.current) return;
-    if (typewriterPlayedRef.current) return;
-    if (activeFilename !== 'welcome.md') return;
+    if (roomCode && activeFilename) {
+      localStorage.setItem(`vector_active_file_${roomCode}`, activeFilename);
+    }
+  }, [roomCode, activeFilename]);
 
-    const welcome = files.find(f => f.filename === 'welcome.md');
-    if (!welcome?.content) return;
-
-    const fullText = welcome.content;
-    // Mark as played immediately so tab-switches can't restart it
-    typewriterPlayedRef.current = true;
-    setTypewriterActive(true);
-    setTypewriterText('');
-
-    let i = 0;
-    const CHAR_DELAY = 12; // ms per character — full text in ~1.5–2 s
-
-    const tick = () => {
-      i++;
-      setTypewriterText(fullText.slice(0, i));
-      if (i < fullText.length) {
-        typewriterTimerRef.current = setTimeout(tick, CHAR_DELAY);
-      } else {
-        setTypewriterActive(false);
-      }
-    };
-    typewriterTimerRef.current = setTimeout(tick, CHAR_DELAY);
-
-    return () => {
-      if (typewriterTimerRef.current) clearTimeout(typewriterTimerRef.current);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFilename, files.length]);
+  /* ── Initial active tab selector ────────────────────────── */
+  const selectInitialActiveFile = useCallback((code: string, filesList: IFile[]) => {
+    if (filesList.length === 0) return;
+    const saved = localStorage.getItem(`vector_active_file_${code}`);
+    if (saved && filesList.some(f => f.filename === saved)) {
+      setActiveFilename(saved);
+    } else {
+      setActiveFilename(filesList[0].filename);
+    }
+  }, []);
 
   /* ── Helper to parse the initial room code from path, query or hash ── */
   const getInitialCode = useCallback(() => {
@@ -297,6 +277,10 @@ function App() {
         if (prev.some(f => f.filename === newFile.filename)) return prev;
         return [...prev, newFile].sort((a, b) => a.order - b.order);
       });
+      if (localAddingFilenameRef.current === newFile.filename) {
+        setActiveFilename(newFile.filename);
+        localAddingFilenameRef.current = null;
+      }
     });
 
     socketRef.current.on('file:rename', ({ oldFilename, newFilename, language }: any) => {
@@ -316,8 +300,6 @@ function App() {
         return next;
       });
     });
-
-
 
     return () => {
       if (socketRef.current) {
@@ -364,7 +346,7 @@ function App() {
         setRoomCreatedAt(data.createdAt);
       }
       setFiles(data.files.sort((a: IFile, b: IFile) => a.order - b.order));
-      if (data.files.length > 0) setActiveFilename(data.files[0].filename);
+      selectInitialActiveFile(data.code, data.files);
 
       // Join new room
       if (socketRef.current) {
@@ -415,7 +397,7 @@ function App() {
               setRoomCreatedAt(data.createdAt);
             }
             setFiles(data.files.sort((a: IFile, b: IFile) => a.order - b.order));
-            if (data.files.length > 0) setActiveFilename(data.files[0].filename);
+            selectInitialActiveFile(data.code, data.files);
             if (socketRef.current) {
               socketRef.current.emit('join-room', data.code);
             }
@@ -431,15 +413,12 @@ function App() {
         const res = await fetch('/api/rooms', { method: 'POST' });
         if (res.ok) {
           const data = await res.json();
-          // Flag this as a brand-new room so the typewriter effect can fire
-          isNewRoomRef.current = true;
-          typewriterPlayedRef.current = false;
           setRoomCode(data.code);
           if (data.createdAt) {
             setRoomCreatedAt(data.createdAt);
           }
           setFiles(data.files.sort((a: IFile, b: IFile) => a.order - b.order));
-          if (data.files.length > 0) setActiveFilename(data.files[0].filename);
+          selectInitialActiveFile(data.code, data.files);
           if (socketRef.current) {
             socketRef.current.emit('join-room', data.code);
           }
@@ -546,6 +525,7 @@ function App() {
       setAddFileError('Name already exists');
       return;
     }
+    localAddingFilenameRef.current = trimmed;
     socketRef.current.emit('file:add', { code: roomCode, filename: trimmed, language: detectLanguage(trimmed) });
     setIsAddingFile(false);
     setNewFilenameVal('');
@@ -771,32 +751,25 @@ function App() {
         <div className="editor-editor-pane">
           {activeFile ? (
             <>
-              {/* Typewriter overlay — renders on top of Monaco during animation */}
-              {typewriterActive && activeFilename === 'welcome.md' ? (
-                <div className="typewriter-pane">
-                  <pre className="typewriter-pre">{typewriterText}<span className="typewriter-cursor">▍</span></pre>
-                </div>
-              ) : (
-                <Editor
-                  height="100%"
-                  theme="vs-dark"
-                  language={activeFile.language}
-                  value={activeFile.content}
-                  onChange={handleEditorChange}
-                  onMount={handleEditorDidMount}
-                  options={{
-                    lineNumbers: 'on',
-                    minimap: { enabled: minimapVisible },
-                    fontSize: 14,
-                    fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-                    automaticLayout: true,
-                    readOnly: connectionStatus !== 'Live',
-                    renderLineHighlight: 'gutter',
-                    scrollBeyondLastLine: false,
-                    padding: { top: 12 },
-                  }}
-                />
-              )}
+              <Editor
+                height="100%"
+                theme="vs-dark"
+                language={activeFile.language}
+                value={activeFile.content}
+                onChange={handleEditorChange}
+                onMount={handleEditorDidMount}
+                options={{
+                  lineNumbers: 'on',
+                  minimap: { enabled: minimapVisible },
+                  fontSize: 14,
+                  fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+                  automaticLayout: true,
+                  readOnly: connectionStatus !== 'Live',
+                  renderLineHighlight: 'gutter',
+                  scrollBeyondLastLine: false,
+                  padding: { top: 12 },
+                }}
+              />
               {connectionStatus !== 'Live' && (
                 <div className="editor-offline-overlay">
                   <div className="offline-message">

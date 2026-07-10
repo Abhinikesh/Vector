@@ -52,7 +52,7 @@ app.post('/api/rooms', async (req, res) => {
   try {
     const code = await generateUniqueRoomCode();
     
-    // Default placeholder file — single welcome guide
+    // Default workspace files to help user understanding
     const defaultFiles = [
       {
         filename: 'welcome.md',
@@ -66,7 +66,7 @@ app.post('/api/rooms', async (req, res) => {
           '- **Add files** — click **+** in the tab bar. Name it anything: `main.py`, `notes.md`, `idea.txt` — any extension works.',
           '- **Rename files** — double-click a tab name to rename it inline.',
           '- **Delete files** — hover a tab and click the × to remove it.',
-          '- **Share this session** — your 6-digit room code is in the header. Hit **Copy** or **Share** and send it to a collaborator.',
+          '- **Share this session** — your 6-digit room code is in the header. Hit **Share** and send it to a collaborator.',
           '- **Join a session** — enter someone\'s 6-digit code in the **"Receive a code"** box to instantly switch into their room.',
           '- **Download** — click **Download** to get a zip of every file in this workspace.',
           '',
@@ -74,6 +74,33 @@ app.post('/api/rooms', async (req, res) => {
         ].join('\n'),
         language: 'markdown',
         order: 0
+      },
+      {
+        filename: 'index.html',
+        content: [
+          '<!-- Welcome to Vector HTML! -->',
+          '<!DOCTYPE html>',
+          '<html lang="en">',
+          '<head>',
+          '  <meta charset="UTF-8">',
+          '  <title>Vector HTML</title>',
+          '</head>',
+          '<body>',
+          '  <h1>Hello from Vector!</h1>',
+          '</body>',
+          '</html>',
+        ].join('\n'),
+        language: 'html',
+        order: 1
+      },
+      {
+        filename: 'main.py',
+        content: [
+          '# Welcome to Vector Python!',
+          'print("Hello from Vector!")',
+        ].join('\n'),
+        language: 'python',
+        order: 2
       }
     ];
 
@@ -191,7 +218,21 @@ io.on('connection', (socket) => {
         const exists = room.files.some(f => f.filename === filename);
         if (!exists) {
           const order = room.files.length;
-          const newFile = { filename, content: '', language, order };
+          
+          // Language-specific templates
+          const defaultTemplates: Record<string, string> = {
+            html: `<!-- Welcome to Vector HTML! -->\n<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Vector HTML</title>\n</head>\n<body>\n  <h1>Hello from Vector!</h1>\n</body>\n</html>\n`,
+            css: `/* Welcome to Vector CSS! */\nbody {\n  font-family: system-ui, sans-serif;\n  background-color: #111113;\n  color: #e4e4e7;\n  padding: 2rem;\n}\n`,
+            js: `// Welcome to Vector JavaScript!\nconsole.log("Hello from Vector!");\n`,
+            py: `# Welcome to Vector Python!\nprint("Hello from Vector!")\n`,
+            md: `# Vector Markdown\n\nUse this file for plain notes, ideas, or formatted documentation.\n`,
+            txt: `Vector Plain Text\n=================\nWrite anything here.\n`,
+          };
+          
+          const ext = filename.split('.').pop()?.toLowerCase() || '';
+          const initialContent = defaultTemplates[ext] || '';
+          
+          const newFile = { filename, content: initialContent, language, order };
           room.files.push(newFile);
           await room.save();
           // Broadcast the new file to everyone in the room
