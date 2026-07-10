@@ -1,0 +1,825 @@
+/* ============================================================
+   VECTOR — Design System
+   Typefaces : Inter (UI chrome) · JetBrains Mono (code)
+   Accent    : Muted amber #c8a96e — used sparingly
+   Palette   : Deep charcoal neutrals only
+   Motion    : 150 ms max, functional only
+   ============================================================ */
+
+/* ─── Custom Properties ────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg-base:    #111113;   /* page base */
+  --bg-surface: #18181b;   /* editor area, cards */
+  --bg-raised:  #1f1f23;   /* header, tab bar, modals */
+  --bg-hover:   #26262c;   /* interactive hover state */
+  --bg-input:   #28282f;   /* form inputs */
+
+  /* Borders */
+  --border-subtle: #28282f;
+  --border-default: #2e2e36;
+
+  /* Text */
+  --text-primary:   #e4e4e7;
+  --text-secondary: #8a8a96;
+  --text-tertiary:  #52525e;
+
+  /* Accent — one color, used sparingly */
+  --accent:       #c8a96e;
+  --accent-dim:   rgba(200, 169, 110, 0.10);
+  --accent-hover: #d6b87c;
+
+  /* Semantic */
+  --green:  #4ade80;
+  --amber:  #fbbf24;
+  --red:    #f87171;
+
+  /* Typography */
+  --font-ui:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Type scale — 5 sizes max */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-lg:   20px;
+  --text-xl:   38px;
+
+  /* Timing */
+  --t-fast: 150ms;
+}
+
+/* ─── Global Reset ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+input {
+  font-family: var(--font-ui);
+}
+
+/* ─── Landing Screen ────────────────────────────────────────── */
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: var(--bg-base);
+}
+
+.landing-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.landing-header h1 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+/* Accent only on the wordmark — restrained */
+.landing-header h1 span {
+  color: var(--accent);
+}
+
+.landing-subtitle {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 380px;
+}
+
+.landing-actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 560px;
+}
+
+/* Action cards — functional, not decorative */
+.action-card {
+  flex: 1;
+  padding: 1.5rem 1.75rem;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: border-color var(--t-fast) ease, background-color var(--t-fast) ease;
+  outline: none;
+}
+
+.action-card h2 {
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin: 0 0 0.4rem 0;
+  color: var(--text-primary);
+}
+
+.action-card p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.action-card:hover {
+  border-color: var(--accent);
+  background-color: var(--bg-hover);
+}
+
+.primary-card:hover,
+.secondary-card:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ─── Join Form ─────────────────────────────────────────────── */
+.join-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  padding: 2.5rem 2rem;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Segmented 6-digit input */
+.segmented-input-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.segmented-input-box {
+  width: 44px;
+  height: 52px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  font-family: var(--font-mono);
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--t-fast) ease;
+}
+
+.segmented-input-box:focus {
+  border-color: var(--accent);
+}
+
+.join-error-msg {
+  color: var(--red);
+  font-size: var(--text-sm);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.join-btn-group {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.btn-cancel,
+.btn-join-submit {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color var(--t-fast) ease;
+}
+
+.btn-cancel {
+  background-color: var(--bg-input);
+  border-color: var(--border-default);
+  color: var(--text-secondary);
+}
+
+.btn-cancel:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-join-submit {
+  background-color: var(--accent);
+  color: #111113;
+  font-weight: 600;
+  border-color: var(--accent);
+}
+
+.btn-join-submit:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* ─── Editor Layout Shell ───────────────────────────────────── */
+.editor-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* ─── Editor Header ─────────────────────────────────────────── */
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  height: 40px;
+  flex-shrink: 0;
+  background-color: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Wordmark */
+.app-logo {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+
+/* Room code display */
+.code-badge-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.code-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.code-badge strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+}
+
+.btn-share {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  transition: border-color var(--t-fast) ease, color var(--t-fast) ease;
+}
+
+.btn-share:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.room-timestamp {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-left: 0.5rem;
+  font-weight: 400;
+}
+
+.code-badge-label,
+.receive-code-label {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.receive-code-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  border-left: 1px solid var(--border-subtle);
+  padding-left: 1rem;
+}
+
+.receive-code-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  padding: 0.2rem 0.5rem;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  width: 90px;
+  outline: none;
+  transition: border-color var(--t-fast) ease;
+}
+
+.receive-code-input:focus {
+  border-color: var(--accent);
+}
+
+.receive-code-error {
+  color: var(--red);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+/* ─── Connection Status ─────────────────────────────────────── */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot.live {
+  background-color: var(--green);
+}
+
+.status-dot.reconnecting {
+  background-color: var(--amber);
+  animation: blink 1s step-start infinite;
+}
+
+.status-dot.offline {
+  background-color: var(--red);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.status-text {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ─── Controls ───────────────────────────────────── */
+
+.minimap-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.minimap-toggle input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 13px;
+  height: 13px;
+}
+
+/* Preview toggle */
+.btn-preview-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--text-secondary);
+  transition: border-color var(--t-fast) ease, color var(--t-fast) ease,
+              background-color var(--t-fast) ease;
+}
+
+.btn-preview-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-preview-toggle.active {
+  background-color: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Download button */
+.btn-download {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--text-secondary);
+  transition: border-color var(--t-fast) ease, color var(--t-fast) ease;
+}
+
+.btn-download:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ─── Tab Bar ───────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  background-color: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
+  height: 36px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1rem;
+  border-right: 1px solid var(--border-subtle);
+  cursor: pointer;
+  user-select: none;
+  min-width: 80px;
+  max-width: 160px;
+  position: relative;
+  transition: background-color var(--t-fast) ease;
+  background-color: transparent;
+}
+
+.tab-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.tab-item.active {
+  background-color: var(--bg-surface);
+}
+
+/* Active indicator — the single accent usage in the tab bar */
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--accent);
+}
+
+.tab-name {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.tab-item.active .tab-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tab-rename-input {
+  border: none;
+  background-color: transparent;
+  color: var(--text-primary);
+  padding: 0;
+  font-size: var(--text-sm);
+  font-family: var(--font-ui);
+  width: 90px;
+  outline: none;
+}
+
+/* Tab delete button — only visible on hover */
+.tab-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  visibility: hidden;
+  border-radius: 2px;
+  transition: color var(--t-fast) ease, background-color var(--t-fast) ease;
+}
+
+.tab-item:hover .tab-delete-btn {
+  visibility: visible;
+}
+
+.tab-delete-btn:hover {
+  color: var(--red);
+  background-color: rgba(248, 113, 113, 0.12);
+}
+
+/* Add tab button */
+.tab-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75rem;
+  border: none;
+  background-color: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-right: 1px solid var(--border-subtle);
+  transition: color var(--t-fast) ease, background-color var(--t-fast) ease;
+  flex-shrink: 0;
+}
+
+.tab-add-btn:hover {
+  color: var(--text-secondary);
+  background-color: var(--bg-hover);
+}
+
+/* Inline new-file input tab */
+.tab-item--adding {
+  min-width: 130px;
+  background-color: var(--bg-hover);
+  border-bottom: 2px solid var(--accent);
+  position: relative;
+}
+
+.tab-new-file-input {
+  width: 110px !important;
+}
+
+.tab-new-file-input::placeholder {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Error tooltip below the inline input */
+.tab-add-error {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 8px;
+  font-size: var(--text-xs);
+  color: var(--red);
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* ─── Editor Workspace ──────────────────────────────────────── */
+.editor-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.editor-editor-pane {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Offline overlay */
+.editor-offline-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 19, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn var(--t-fast) ease;
+}
+
+.offline-message {
+  background: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  padding: 1.5rem 2rem;
+  border-radius: 6px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.offline-message span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+}
+
+.offline-message p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Preview Pane ──────────────────────────────────────────── */
+.editor-preview-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-subtle);
+  background-color: #fff;
+  animation: slideIn var(--t-fast) ease;
+  min-width: 0;
+}
+
+.preview-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.75rem;
+  height: 36px;
+  flex-shrink: 0;
+  background-color: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.preview-pane-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.btn-preview-refresh {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  transition: border-color var(--t-fast) ease, color var(--t-fast) ease;
+}
+
+.btn-preview-refresh:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.preview-iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  min-height: 0;
+}
+
+/* ─── No File Screen ────────────────────────────────────────── */
+.no-file-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+/* ─── Animations ────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ─── Disabled State ────────────────────────────────────────── */
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.action-card:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── Typewriter Pane ───────────────────────────────────────── */
+/* Replaces Monaco only during the one-time welcome.md animation */
+.typewriter-pane {
+  flex: 1;
+  height: 100%;
+  background-color: #1e1e1e; /* matches vs-dark Monaco background */
+  overflow: auto;
+  padding: 12px 0 12px 72px; /* 72px left matches Monaco's default gutter */
+}
+
+.typewriter-pre {
+  margin: 0;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d4d4d4; /* vs-dark default text colour */
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Blinking block cursor */
+.typewriter-cursor {
+  display: inline-block;
+  color: var(--accent);
+  animation: tw-blink 0.8s step-end infinite;
+}
+
+@keyframes tw-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
