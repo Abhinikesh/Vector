@@ -22,6 +22,8 @@ import {
 import { detectLanguage } from './utils/languageDetector';
 import './App.css';
 
+const SERVER_URL = (import.meta.env.VITE_SERVER_URL || 'http://localhost:5001').replace(/\/+$/, '');
+
 interface IFile {
   filename: string;
   content: string;
@@ -198,7 +200,7 @@ function App() {
   const triggerIdleSync = async () => {
     if (!roomCode) return;
     try {
-      const res = await fetch(`/api/rooms/${roomCode}`);
+      const res = await fetch(`${SERVER_URL}/api/rooms/${roomCode}`);
       if (!res.ok) return;
       const data = await res.json();
       const fetched: IFile[] = data.files.sort((a: IFile, b: IFile) => a.order - b.order);
@@ -220,7 +222,7 @@ function App() {
 
   /* ── Socket setup ────────────────────────────────────────── */
   useEffect(() => {
-    socketRef.current = io('http://localhost:5001', {
+    socketRef.current = io(SERVER_URL, {
       withCredentials: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
@@ -231,7 +233,7 @@ function App() {
       if (roomCode) {
         socketRef.current.emit('join-room', roomCode);
         try {
-          const res = await fetch(`/api/rooms/${roomCode}`);
+          const res = await fetch(`${SERVER_URL}/api/rooms/${roomCode}`);
           if (res.ok) {
             const data = await res.json();
             const fetched: IFile[] = data.files.sort((a: IFile, b: IFile) => a.order - b.order);
@@ -324,7 +326,7 @@ function App() {
     setReceiveError(null);
 
     try {
-      const res = await fetch(`/api/rooms/${code}`);
+      const res = await fetch(`${SERVER_URL}/api/rooms/${code}`);
       if (!res.ok) {
         if (res.status === 404) {
           setReceiveError('Session not found');
@@ -389,7 +391,7 @@ function App() {
       const initialCode = getInitialCode();
       if (initialCode) {
         try {
-          const res = await fetch(`/api/rooms/${initialCode}`);
+          const res = await fetch(`${SERVER_URL}/api/rooms/${initialCode}`);
           if (res.ok) {
             const data = await res.json();
             setRoomCode(data.code);
@@ -410,7 +412,7 @@ function App() {
 
       // Create new room automatically if no valid initial code exists
       try {
-        const res = await fetch('/api/rooms', { method: 'POST' });
+        const res = await fetch(`${SERVER_URL}/api/rooms`, { method: 'POST' });
         if (res.ok) {
           const data = await res.json();
           setRoomCode(data.code);
