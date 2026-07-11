@@ -33,6 +33,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Root route for uptime monitoring
+app.get('/', (req, res) => {
+  res.send('Vector server is running');
+});
+
 // Helper function to generate unique 6-digit room code
 async function generateUniqueRoomCode(): Promise<string> {
   let isUnique = false;
